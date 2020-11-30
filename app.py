@@ -75,7 +75,7 @@ def verify_mapa_imagen(mapa_imagen):
 @app.before_request
 def before_request():
 
-    """ if 'usuario' not in session and request.endpoint in ['monitor_logout','pacientes_inicio','pacientes_agregar','pacientes_modificar','pacientes_actualizar','paciente_dashboard','pacientes_lista_sensores','pacientes_trisensor_agregar','pacientes_caidasensor_agregar','pacientes_trisensor_modificar','pacientes_trisensor_eliminar','cargar_datos_trisensor','pacientes_caidasensor_modificar','generar_datos_caida_carga','ajax_filtrar_fechas','ajax_trisensor_presencia_fecha','ajax_detalles','monitor_cambiar_contrasena']:
+    if 'usuario' not in session and request.endpoint in ['monitor_logout','pacientes_inicio','pacientes_agregar','pacientes_modificar','pacientes_actualizar','paciente_dashboard','pacientes_lista_sensores','pacientes_trisensor_agregar','pacientes_caidasensor_agregar','pacientes_trisensor_modificar','pacientes_trisensor_eliminar','cargar_datos_trisensor','pacientes_caidasensor_modificar','generar_datos_caida_carga','ajax_filtrar_fechas','ajax_trisensor_presencia_fecha','ajax_detalles','monitor_cambiar_contrasena']:
         flash("No ha iniciado sesión2", "error")
         return redirect(url_for('monitor_login'))
     elif 'usuario' not in session and request.endpoint in ['admin_logout','admin_lista_monitores','admin_monitor_agregar','admin_monitor_borrar','admin_monitor_modificar','admin_monitor_resetear_contrasena' , 'admin_cambiar_contrasena']:
@@ -87,7 +87,7 @@ def before_request():
             return redirect(url_for('pacientes_inicio'))
         elif session["tipo"]=='admin' and request.endpoint not in ['static','admin_logout','admin_lista_monitores','admin_monitor_agregar','admin_monitor_borrar','admin_monitor_modificar', 'admin_monitor_resetear_contrasena','admin_cambiar_contrasena']:
             flash("No tiene permiso para entrar", "error")
-            return redirect(url_for('admin_lista_monitores')) """
+            return redirect(url_for('admin_lista_monitores'))
 
 
 @app.route('/')
