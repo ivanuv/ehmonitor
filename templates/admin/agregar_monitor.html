@@ -1,0 +1,32 @@
+{% extends 'base/admin/admin_base.html'%}
+
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+AGREGAR MONITOR
+<form action="/admin/monitor/agregar" method="POST" enctype="multipart/form-data">
+
+  <div class="row">
+    <div class="col-3">
+      <div class="form-group">
+        <label for="nombre_paciente">Nombre Monitor</label>
+        <input type="text" class="form-control" name="nombre_monitor" id="nombre_monitor" placeholder="Nombre Monitor">
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="form-group">
+        <label for="nombre_paciente">Usuario  Monitor</label>
+        <input type="text" class="form-control" name="usuario_monitor" id="usuario_monitor" placeholder="Usuario Monitor">
+      </div>
+    </div>
+  </div>
+
+  <hr>
+  <div class="row">
+    <div class="col mt-5">
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Agregar Monitor</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

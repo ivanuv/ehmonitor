@@ -1,0 +1,42 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+{% from 'base/_macros.html' import mostrar_mensaje %}
+{{  mostrar_mensaje(messages) }}
+
+  <div class="row justify-content-md-center mx-1">
+    <div class="card ">
+      <div class="card-body">
+        <form action="/monitor/login" method="POST" enctype="multipart/form-data" >
+          <div class="row justify-content-md-center">
+            <div class="col-12 col-md-12 text-center">
+              <h3>Monitor</h3>
+              <h5>Iniciar Sesión</h5>
+            </div>
+            <div class="col-12 col-md-10">
+              <div class="form-group">
+                <label for="usuario"><i class="fas fa-user"></i> Usuario</label>
+                <input type="text" class="form-control" id="usuario" name="usuario">
+              </div>
+            </div>
+          </div>
+          <div class="row justify-content-md-center">
+            <div class="col-12 col-md-10">
+              <div class="form-group">
+                <label for="contrasena"><i class="fas fa-key"></i> Contraseña</label>
+                <input type="password" class="form-control" id="contrasena" name="contrasena">
+              </div>
+            </div>
+            
+          </div>
+          <div class="row justify-content-md-center">
+            <div class="col-12 col-md-10">
+              <button type="submit" class="btn btn-primary btn-block my-5">Entrar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

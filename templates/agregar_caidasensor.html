@@ -1,0 +1,43 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+AGREGAR SENSOR CAIDA
+<form action="/pacientes/{{id_paciente}}/sensores/agregar_caidasensor" method="POST" enctype="multipart/form-data">
+
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label for="nombre_paciente">Ubicación</label>
+        <input type="text" class="form-control" name="ubicacion" id="ubicacion" placeholder="Ubicación del Sensor">
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label for="nombre_paciente">Apodo (de la ubicación)</label>
+        <input type="text" class="form-control" name="apodo_ubicacion" id="apodo_ubicacion" placeholder="Apodo de la ubicación">
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <select class="custom-select" name="estado_sensor" id="estado_sensor">
+        <option value="activo" selected>Activo</option>
+        <option value="desactivado">Desactivado</option>
+      </select>
+    </div>
+    <div class="col-3">
+      
+    </div>
+  </div>
+
+  <hr>
+  <div class="row">
+    <div class="col mt-5">
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Agregar Trisensor</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

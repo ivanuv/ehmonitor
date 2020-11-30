@@ -1,0 +1,45 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+MODIFICAR SENSOR CAIDA
+<form action="/sensor_caida/modificar/{{caidasensor.0}}" method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="id_sensor" name="id_sensor" value="{{caidasensor.0}}">
+  <input type="hidden" name="id_paciente" name="id_paciente" value="{{caidasensor.2}}">
+  
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label for="nombre_paciente">Ubicación</label>
+        <input type="text" class="form-control" name="ubicacion" id="ubicacion" placeholder="Ubicación del Sensor" value="{{caidasensor.1}}">
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label for="nombre_paciente">Apodo de la Ubicación</label>
+        <input type="text" class="form-control" name="apodo_ubicacion" id="apodo_ubicacion" placeholder="Apodo de la Ubicación del Sensor" value="{{caidasensor.4}}">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <select class="custom-select" name="estado_sensor" id="estado_sensor">
+        <option value="activo" {% if caidasensor.3=='activo' %} selected {% endif %}>Activo</option>
+        <option value="desactivado" {% if caidasensor.3=='desactivado' %} selected {% endif %}>Desactivado</option>
+      </select>
+    </div>
+
+    <div class="col-3">
+      
+    </div>
+  </div>
+
+  <hr>
+  <div class="row">
+    <div class="col mt-5">
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Modificar Sensor Caida</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

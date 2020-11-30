@@ -1,0 +1,661 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+<h3>Dashboard Paciente</h3>
+<h4>Paciente : {{paciente.nombre}}</h4>
+
+
+
+<ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <a class="nav-link active" id="inicio-db-pill-tab" data-toggle="pill" href="#inicio-db-pill" role="tab" aria-controls="inicio-db-pill" aria-selected="true">Inicio</a>
+  </li>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link " id="ayuda-pill-tab" data-toggle="pill" href="#ayuda-pill" role="tab" aria-controls="ayuda-pill" aria-selected="true">Ayuda</a>
+  </li>
+</ul>
+<hr>
+<div class="tab-content" id="pills-tabContent">
+  <div class="tab-pane fade show active" id="inicio-db-pill" role="tabpanel" aria-labelledby="inicio-db-pill-tab">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Mapa del hogar</h5>
+        <div class="row justify-content-md-center">
+          <div class="col-12 col-md-10 col-lg-6">
+            {% if paciente.mapa_hogar: %}
+              <img src="{{ url_for('static', filename='img/mapas/') }}{{paciente.mapa_hogar}}" class="img-thumbnail rounded mx-auto d-block">
+            {% else: %}
+              <p class="card-text">El Paciente no tiene imagen de Mapa de Hogar</p>
+            {% endif %}
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-12 col-md-12">
+            <h5>Rango de días para filtrar</h5>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label for="fecha-inicio">Fecha inicio</label>
+              <input type="date" class="form-control" id="fecha-inicio" name="" value="{{fecha_inicial_dashboard}}">
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="form-group">
+              <label for="fecha-final">Fecha Fin</label>
+              <input type="date" class="form-control" id="fecha-fin" name="" value="{{fecha_actual_dashboard}}">
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary" id="filtrar-fechas">Filtrar</button>
+        <hr>
+        <div class="my-3">
+          <div id="muestra-trisensor"></div>
+          <div id="muestra-caidasensor"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane fade  " id="ayuda-pill" role="tabpanel" aria-labelledby="ayuda-pill-tab">
+    <h5>Cada parte del día se compone de los siguientes rangos, cada uno de ellos independiente del otro:</h5>
+    <img src="{{ url_for('static', filename='img/descripcion_tiemp.png') }}" class="w-75 mx-auto d-block">
+    <p class="text-monospace">Madrugada: 24:00 - 5:59 hrs</p>
+    <p class="text-monospace">Mañana: 6:00 - 11:59 hrs</p>
+    <p class="text-monospace">Tarde: 12:00 - 17:00 hrs</p>
+    <p class="text-monospace">Noche: 18:00 - 23:99 hrs</p>
+    <hr>
+    <h5>Medidas Estadísticas mostradas</h5>
+    <dl class="row">
+      <dt class="col-sm-3">Media</dt>
+      <dd class="col-sm-9">Conocida tambien como la media aritmética o promedio, el cual indica el resultado de dividir la sumatoria de los datos entre los rango de fechas, dividido por su cantidad de datos encontrados.</dd>
+
+      <dt class="col-sm-3">Mediana</dt>
+      <dd class="col-sm-9">Es el valor central de todos los datos entre las fechas seleccionadas</dd>
+
+      <dt class="col-sm-3">Desviación Estandar (D.E)</dt>
+      <dd class="col-sm-9">Es una medida de dispersión, el cual indica qué tan disperso estan los datos entre las fechas.</dd>
+
+      <dt class="col-sm-3">Valor Máximo (Máx.)</dt>
+      <dd class="col-sm-9">Es la cantidad de horas máxima que hubo movimiento en el lugar del sensor.</dd>
+
+      <dt class="col-sm-3">Valor Mínimo (Mín)</dt>
+      <dd class="col-sm-9">Es el valor mínimo de los datos entre las fechas seleccionadas, el cual indica cuanto es la hora total mínima que existió movimiento.</dd>
+    </dl>
+
+  </div><!-- fin  tab-->
+
+
+</div>
+
+
+<div class="modal fade" id="modal-detalles-partedia" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="fecha-toma-muestra" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fecha-toma-muestra">Detalles de la presencia</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-detalles-partedia-fechas"></p>
+        <p id="modal-detalles-partedia-partedia"></p>
+        <hr>
+        <div class="table-responsive">
+          <table id="tabla-detalles" class="order-column table table-hover table-bordered table-striped  table-sm text-center" style="width:100%" data-page-length='15'>
+            <thead>
+              <tr>
+                <th scope="col">ID#</th>
+                <th scope="col" >Fecha</th>
+                <th scope="col" >Presencia (0 o 1)</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="modal-grafico-serie" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="seriegraficotitulo" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="seriegraficotitulo">Gráfico de Series</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-grafico-serie-fechas"></p>
+        <hr>
+        <div id="grafico-serie" class="w-auto my-5"></div>
+        <hr>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+{% endblock %}
+
+{% block js_codigo %}
+<link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css" />
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+
+
+<script src="http://code.highcharts.com/highcharts.js"></script>
+
+<script>
+
+  var chart1, options;
+  var chart2, options2;
+
+  setInterval("filtroFechas()", 180000);
+
+  function filtroFechas() {
+    $('#modal-detalles-partedia').modal("hide");
+    var fechaInicio = $("#fecha-inicio").val();
+    var fechaFin = $("#fecha-fin").val();
+    var idPaciente = {{id_paciente}};
+    $.ajax({
+      url: '/ajax/filtrar_fechas',
+      data: { fechaInicio: fechaInicio, fechaFin: fechaFin, idPaciente: idPaciente },
+      type: 'POST',
+      dataType: 'json',
+      success: function (response) {
+        //console.log(response);
+        $("#muestra-trisensor").fadeOut(200).html("");
+        $("#muestra-caidasensor").fadeOut(200).html("");
+        if (jQuery.isEmptyObject(response)) {
+          $("#muestra-trisensor").fadeIn(200).html('<i class="far fa-frown"></i> No hay Resultados');
+        } else {
+          var html = "";
+          for (let index = 0; index < response.length; index++) {
+            console.log(response[index]);
+            if (response[index].tipo == "trisensor") {
+              html += '<h3 class="mb-4">Sensor Trisensor Id: ' + response[index].id_trisensor + ' Ubicación : ' + response[index].ubicacion + ' - '+ response[index].apodo_ubicacion +  ' </h3>';
+              html += '<button class="btn btn-warning mb-3" onclick="GraficarSerie(' + response[index].id_trisensor + ' )"><i class="fas fa-chart-line"></i> Ver Gráfico</button>';
+              html += '';
+              html += '<div class="row">';
+              html += '<div class="col-sm-12 col-md-6 col-lg-3 mb-3">';
+              html += '  <div class="card">';
+              html += '    <h5 class="card-header bg-info text-white">Madrugada</h5>';
+              html += '    <div class="card-body">';
+              html += '      <p class="card-text" ><strong>Media:</strong> ' + response[index].madrugada.media + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mediana :</strong> ' + response[index].madrugada.mediana + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>D.E :</strong> ' + response[index].madrugada.DE + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Máx. :</strong> ≈ ' + response[index].madrugada.max + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mín. :</strong> ≈ ' + response[index].madrugada.min + ' hrs</p>';
+              html += '       <button class="btn btn-primary " onclick="detallesParteDia(' + response[index].id_trisensor + ', 1 )"> Ver detalles</button>';
+              html += '    </div>';
+              html += '  </div>';
+              html += '</div>';
+              html += '<div class="col-sm-12 col-md-6 col-lg-3 mb-3">';
+              html += '  <div class="card">';
+              html += '    <h5 class="card-header bg-info text-white">Mañana</h5>';
+              html += '    <div class="card-body">';
+              html += '      <p class="card-text" ><strong>Media:</strong> ' + response[index].manana.media + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mediana :</strong> ' + response[index].manana.mediana + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>D.E :</strong> ' + response[index].manana.DE + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Máx. :</strong> ≈ ' + response[index].manana.max + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mín. :</strong> ≈ ' + response[index].manana.min + ' hrs</p>';
+              html += '       <button class="btn btn-primary " onclick="detallesParteDia(' + response[index].id_trisensor + ', 2 )"> Ver detalles</button>';
+              html += '    </div>';
+              html += '  </div>';
+              html += '</div>';
+              html += '<div class="col-sm-12 col-md-6 col-lg-3 mb-3">';
+              html += '  <div class="card">';
+              html += '    <h5 class="card-header bg-info text-white">Tarde</h5>';
+              html += '    <div class="card-body">';
+              html += '      <p class="card-text" ><strong>Media:</strong> ' + response[index].tarde.media + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mediana :</strong> ' + response[index].tarde.mediana + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>D.E :</strong> ' + response[index].tarde.DE + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Máx. :</strong> ≈ ' + response[index].tarde.max + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mín. :</strong> ≈ ' + response[index].tarde.min + ' hrs</p>';
+              html += '       <button class="btn btn-primary " onclick="detallesParteDia(' + response[index].id_trisensor + ', 3 )"> Ver detalles</button>';
+              html += '    </div>';
+              html += '  </div>';
+              html += '</div>';
+              html += '<div class="col-sm-12 col-md-6 col-lg-3 mb-3">';
+              html += '  <div class="card">';
+              html += '    <h5 class="card-header bg-info text-white">Noche</h5>';
+              html += '    <div class="card-body">';
+              html += '      <p class="card-text" ><strong>Media:</strong> ' + response[index].noche.media + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mediana :</strong> ' + response[index].noche.mediana + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>D.E :</strong> ' + response[index].noche.DE + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Máx. :</strong> ≈ ' + response[index].noche.max + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mín. :</strong> ≈ ' + response[index].noche.min + ' hrs</p>';
+              html += '       <button class="btn btn-primary " onclick="detallesParteDia(' + response[index].id_trisensor + ', 4 )"> Ver detalles</button>';
+              html += '    </div>';
+              html += '  </div>';
+              html += '</div>';
+              html += '</div>';
+              html += '<hr>';
+              $("#muestra-trisensor").fadeIn(200).append(html);
+              html = ""
+            } else if (response[index].tipo == "caidasensor") {
+              html += '<h3 class="mb-4">Sensor de Caída Id: ' + response[index].id_caidasensor + ' Ubicación : ' + response[index].ubicacion + ' - ' + response[index].apodo_ubicacion + '</h3>';
+              html += '<button class="btn btn-warning mb-3" onclick="GraficarSerie(' + response[index].id_caidasensor + ' )"> <i class="fas fa-chart-line"></i> Ver Gráfico</button>';
+              html += '';
+              html += '<div class="row">';
+              html += '<div class="col-sm-12 col-md-6 col-lg-3 mb-3">';
+              html += '  <div class="card">';
+              html += '    <h5 class="card-header bg-success text-white">Madrugada</h5>';
+              html += '    <div class="card-body">';
+              html += '      <p class="card-text" ><strong>Media:</strong> ' + response[index].madrugada.media + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mediana :</strong> ' + response[index].madrugada.mediana + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>D.E :</strong> ' + response[index].madrugada.DE + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Máx. :</strong> ' + response[index].madrugada.max + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mín. :</strong> ' + response[index].madrugada.min + ' hrs</p>';
+              html += '       <button class="btn btn-primary " onclick="detallesParteDia(' + response[index].id_caidasensor + ', 1 )"> Ver detalles</button>';
+              html += '    </div>';
+              html += '  </div>';
+              html += '</div>';
+              html += '<div class="col-sm-12 col-md-6 col-lg-3 mb-3">';
+              html += '  <div class="card">';
+              html += '    <h5 class="card-header bg-success text-white">Mañana</h5>';
+              html += '    <div class="card-body">';
+              html += '      <p class="card-text" ><strong>Media:</strong> ' + response[index].manana.media + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mediana :</strong> ' + response[index].manana.mediana + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>D.E :</strong> ' + response[index].manana.DE + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Máx. :</strong> ' + response[index].manana.max + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mín. :</strong> ' + response[index].manana.min + ' hrs</p>';
+              html += '       <button class="btn btn-primary " onclick="detallesParteDia(' + response[index].id_caidasensor + ', 2 )"> Ver detalles</button>';
+              html += '    </div>';
+              html += '  </div>';
+              html += '</div>';
+              html += '<div class="col-sm-12 col-md-6 col-lg-3 mb-3">';
+              html += '  <div class="card">';
+              html += '    <h5 class="card-header bg-success text-white">Tarde</h5>';
+              html += '    <div class="card-body">';
+              html += '      <p class="card-text text-decoration-none" ><strong>Media:</strong> ' + response[index].tarde.media + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mediana :</strong> ' + response[index].tarde.mediana + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>D.E :</strong> ' + response[index].tarde.DE + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Máx. :</strong> ' + response[index].tarde.max + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mín. :</strong>≈ ' + response[index].tarde.min + ' hrs</p>';
+              html += '       <button class="btn btn-primary " onclick="detallesParteDia(' + response[index].id_caidasensor + ', 3 )"> Ver detalles</button>';
+              html += '    </div>';
+              html += '  </div>';
+              html += '</div>';
+              html += '<div class="col-sm-12 col-md-6 col-lg-3 mb-3">';
+              html += '  <div class="card">';
+              html += '    <h5 class="card-header bg-success text-white">Noche</h5>';
+              html += '    <div class="card-body">';
+              html += '      <p class="card-text" ><strong>Media:</strong> ' + response[index].noche.media + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mediana :</strong> ' + response[index].noche.mediana + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>D.E :</strong> ' + response[index].noche.DE + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Máx. :</strong> ' + response[index].noche.max + ' hrs</p>';
+              html += '      <p class="card-text" ><strong>Mín. :</strong> ' + response[index].noche.min + ' hrs</p>';
+              html += '       <button class="btn btn-primary " onclick="detallesParteDia(' + response[index].id_caidasensor + ', 4 )"> Ver detalles</button>';
+              html += '    </div>';
+              html += '  </div>';
+              html += '</div>';
+              html += '</div>';
+              html += '<hr>';
+              $("#muestra-caidasensor").fadeIn(200).append(html);
+              html = ""
+            }
+          }
+        }
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+  }
+
+  function GraficarSerie(id_sensor) {
+    $('#modal-grafico-serie').modal("show");
+    var fechaInicio = $("#fecha-inicio").val();
+    var fechaFin = $("#fecha-fin").val();
+
+
+    $("#modal-grafico-serie-fechas").html("Desde <strong>" + moment(fechaInicio).format('MM/DD/YYYY') + "</strong> hasta <strong>" + moment(fechaFin).format('MM/DD/YYYY')+ "</strong>" );
+    $.ajax({
+      url: '/ajax/graficar/presencia_fecha/',
+      data: { id_sensor: id_sensor, fechaInicio: fechaInicio, fechaFin: fechaFin },
+      type: 'POST',
+      dataType: 'json',
+      success: function (response) {
+        var madrugada = [];
+        var manana = [];
+        var tarde = [];
+        var noche = [];
+        console.log(response.manana);
+        for (let index = 0; index < response.madrugada.length; index++) {
+          b = [Date.parse(response.madrugada[index][0]), parseFloat(response.madrugada[index][1])]
+          madrugada.push(b)
+        }
+        for (let index = 0; index < response.manana.length; index++) {
+          b = [Date.parse(response.manana[index][0]), parseFloat(response.manana[index][1])]
+          manana.push(b)
+        }
+        for (let index = 0; index < response.tarde.length; index++) {
+          b = [Date.parse(response.tarde[index][0]), parseFloat(response.tarde[index][1])]
+          tarde.push(b)
+        }
+        for (let index = 0; index < response.noche.length; index++) {
+          b = [Date.parse(response.noche[index][0]), parseFloat(response.noche[index][1])]
+          noche.push(b)
+        }
+        options2.series[0].data = madrugada;
+        options2.series[1].data = manana;
+        options2.series[2].data = tarde;
+        options2.series[3].data = noche;
+        chart2 = new Highcharts.Chart(options2);
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+    seriegrafico();
+  }
+
+
+  function detallesParteDia(id_sensor, parte_dia) {
+    $('#modal-detalles-partedia').modal("show");
+    var fechaInicio = $("#fecha-inicio").val();
+    var fechaFin = $("#fecha-fin").val();
+
+    $("#modal-detalles-partedia-fechas").html("Desde " + moment(fechaInicio).format('MM/DD/YYYY') + " hasta " + moment(fechaFin).format('MM/DD/YYYY'));
+    switch (parte_dia) {
+      case 1:
+        $("#modal-detalles-partedia-partedia").html("Parte del día: Madrugada");
+        break;
+      case 2:
+        $("#modal-detalles-partedia-partedia").html("Parte del día: Mañana");
+        break;
+      case 3:
+        $("#modal-detalles-partedia-partedia").html("Parte del día: Tarde");
+        break;
+      case 4:
+        $("#modal-detalles-partedia-partedia").html("Parte del día: Noche");
+        break;
+      default:
+        break;
+    }
+
+
+    tabladetalles = $('#tabla-detalles').DataTable({
+      orderCellsTop: true,
+      fixedHeader: true,
+      "destroy": true,
+      "ajax": {
+        "url": "/ajax/detalles",
+        "method": 'POST',
+        "data": { id_sensor: id_sensor, fechaInicio: fechaInicio, fechaFin: fechaFin, parte_dia: parte_dia },
+        "dataSrc": ""
+      },
+      "columns": [
+        { "data": "idDato" },
+        { "data": "fecha",
+          "render" : function(data, type, row){
+            return moment(data).format('DD/MM/YYYY') + ' - <strong>' + moment(data).format('HH:mm:ss') + '</strong>'
+          }
+        },
+        { "data": "presencia" }
+      ], "rowCallback": function (row, data, index) {
+        if (data.presencia == "1") {
+          $('td', row).addClass('bg-success text-white');
+        }
+      },
+      "order": [
+        [1, "desc"]
+      ],
+      "language": {
+        "sProcessing": "Procesando...",
+        "sLengthMenu": "Mostrar _MENU_ registros",
+        "sZeroRecords": "No se encontraron resultados",
+        "sEmptyTable": "Ningún dato disponible en esta tabla",
+        "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+        "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+        "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+        "sInfoPostFix": "",
+        "sSearch": "Buscar:",
+        "sUrl": "",
+        "sInfoThousands": ",",
+        "sLoadingRecords": "Cargando...",
+        "oPaginate": {
+          "sFirst": "Primero",
+          "sLast": "Último",
+          "sNext": "Siguiente",
+          "sPrevious": "Anterior"
+        },
+        "oAria": {
+          "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+          "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+        }
+      }
+    });
+  }
+
+  $(document).ready(function () {
+    filtroFechas();
+    $('#filtrar-fechas').on("click", function (e) {
+      filtroFechas();
+    });
+    $("#muestra-trisensor").hide();
+    $("#muestra-caidasensor").hide();
+
+    $('#tabla-detalles thead tr').clone(true).appendTo('#tabla-detalles thead');
+    $('#tabla-detalles thead tr:eq(1) th').each(function (i) {
+      var title = $(this).text();
+      $(this).html('<input type="text" placeholder="Buscar ' + title + '" />');
+
+      $('input', this).on('keyup change', function () {
+        if (tabladetalles.column(i).search() !== this.value) {
+          tabladetalles
+            .column(i)
+            .search(this.value)
+            .draw();
+        }
+      });
+    });
+
+
+    /*AJAX CAIDASENSOR que obtiene los datos para el gráfico de torta*/
+    /* 
+    $.ajax({
+      url: '/ajax/caidasensor/presencia/detalles',
+      data: { idPresencia_caida: idPresencia_caida },
+      type: 'POST',
+      dataType: 'json',
+      success: function (response) {
+        data = [{ name: 'Presencia', y: response[0].presencia }, { name: 'No Presencia', y: response[0].no_presencia }]
+        options.series[0].data = data;
+        console.log(options.series[0].data)
+        chart1 = new Highcharts.Chart(options);
+      },
+      error: function (error) {
+        console.log(error);
+      }
+    });
+    torta();
+    e.preventDefault();
+*/
+
+  });//Fin document ready jquery
+
+  function torta() {
+    options = {
+      chart: {
+        renderTo: 'grafico-pie',
+        type: 'pie',
+        plotBackgroundColor: '#f8f9fa',
+        plotShadow: false,
+      },
+      title: {
+        text: 'Porcentaje de Presencia respecto al tiempo que estuvo en la habitación'
+      },
+      tooltip: {
+        pointFormat: '<b>{point.percentage:.1f} %</b>'
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: true,
+            format: '{point.name} : <b>{point.percentage:.1f} %'
+
+          }
+        }
+      },
+      series: [{
+        name: "Presencia",
+        colorByPoint: true,
+        data: []
+      }]
+    }
+  }
+
+  function seriegrafico() {
+    var sensor_to_render = ""
+    sensor_to_render = 'grafico-serie'
+
+    options2 = {
+
+      chart: {
+        renderTo: sensor_to_render,
+        //type: 'scatter',
+        zoomType: 'xy',
+        scrollablePlotArea: {
+          minWidth: 800
+        },
+        borderWidth: 0.8,
+        borderColor: '#8E8E8E',
+        borderRadius: '15px'
+      },
+      lang: {
+        weekdays: [
+          'Lunes', 'Martes', 'Miercoles', 'Jueves',
+          'Viernes', 'Sabado', 'Domingo'
+        ],
+        months: [
+          'Enero', 'Febrero', 'Marzo', 'Abril',
+          'Mayo', 'Junio', 'Julio', 'Agosto',
+          'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+        ],
+      },
+      title: {
+        text: 'Gráfico de Series de presencia por partes del día'
+      }, subtitle: {
+        text: ' '
+      }, yAxis: {
+
+        min: 0,
+        max: 6,
+        title: {
+          enabled: true,
+          text: 'Horas en habitación (en hrs decimales)',
+          style: {
+            'fontSize': 19
+          }
+        },
+        startOnTick: true,
+        endOnTick: true,
+        showLastLabel: true
+
+      }, xAxis: {
+        type: 'datetime',
+        title: {
+          text: 'Fecha',
+          style: {
+            'fontSize': 17
+          }
+        },
+        dateTimeLabelFormats: { // don't display the dummy year
+          month: '%b',
+          year: '%Y'
+        }
+
+      },
+      legend: {
+        layout: 'vertical',
+        align: 'left',
+        verticalAlign: 'top',
+        x: 100,
+        y: 10,
+        floating: true,
+        backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF',
+        borderWidth: 1
+      },
+      plotOptions: {
+        series: {
+          marker: {
+            radius: 5,
+            states: {
+              hover: {
+                enabled: true,
+                lineColor: 'rgb(100,100,100)'
+              }
+            }
+          },
+          states: {
+            hover: {
+              marker: {
+                enabled: false
+              }
+            }
+          },
+          tooltip: {
+            xDateFormat: '%Y-%m-%d',
+            headerFormat: '<b>{series.name}</b><br>',
+            pointFormat: '{point.y} hrs, {point.x:%d-%m-%Y}'
+          }
+        },
+      }, series: [{
+        name: 'Madrugada',
+        color: 'rgba(0, 0, 255, .5)',
+        data: []
+      },
+      {
+        name: 'Mañana',
+        color: 'rgba(37, 187, 0, .5)',
+        data: []
+      },
+      {
+        name: 'Tarde',
+        color: 'rgba(255, 0, 0, .5)',
+
+        data: []
+      }
+        , {
+        name: 'Noche',
+        color: 'rgba(255, 158, 0, .5)',
+        marker: { symbol: 'circle', radius: 5 },
+        data: []
+      }
+
+
+
+
+      ]
+    }
+
+  }
+</script>
+
+
+
+{% endblock %}

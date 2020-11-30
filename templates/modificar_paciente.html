@@ -1,0 +1,74 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+<h2>MODIFICAR PACIENTE</h2>
+<form action="/pacientes/actualizar/{{paciente.0}}" method="POST" enctype="multipart/form-data">
+
+  <div class="row">
+    <div class="col-12 col-md-3">
+      <div class="form-group">
+        <label for="nombre_paciente">Nombre Paciente</label>
+        <input type="text" class="form-control" name="nombre_paciente" id="nombre_paciente" placeholder="Nombre Paciente" value="{{paciente.1}}">
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="form-group">
+        <label for="rut_paciente">Rut</label>
+        <input type="text" class="form-control" name="rut_paciente" id="rut_paciente" placeholder="Rut Paciente" value="{{paciente.2}}" readonly>
+      </div>
+    </div>
+  </div>
+
+  
+  
+  <hr>
+
+  <div class="row">
+
+    <div class="col-12 col-md-6">
+      <div class="custom-file my-3">
+        
+        <input type="file" class="custom-file-input" name="mapa_imagen" id="mapa_imagen" >
+        <label class="custom-file-label" for="customFileLang" data-browse="Elegir">Seleccionar Mapa Imagen (opcional)</label>
+        <p><i class="fas fa-info-circle mt-3"></i> Sólo puede subir imágenes con extensión JPG o JPEG</p>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+  <div class="row"> 
+    <div class="col-12 col-md-6">
+      {% if paciente.3: %}
+      <div class="form-group">
+        <label for="nombre_paciente">Mapa Hogar</label>
+        <img src="{{ url_for('static', filename='img/mapas/') }}{{paciente.3}}" class="w-75 img-thumbnail rounded mx-auto d-block">
+      </div>
+      {% else: %}
+      <p><i class="fas fa-exclamation-triangle"></i> El paciente no posee mapa de hogar</p>
+      {% endif %}
+    </div>
+    <div class="col-3">
+    </div>
+  </div>
+
+  <hr>
+  <div class="row">
+    <div class="col mt-5">
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Modificar Paciente</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block js_codigo %}
+<script>
+
+
+  $('#mapa_imagen').on('change', function () {
+    var fileName = document.getElementById("mapa_imagen").files[0].name;
+    $(this).next('.custom-file-label').addClass("selected").html(fileName);
+  })
+
+</script>
+{% endblock %}  

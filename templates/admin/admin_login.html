@@ -1,0 +1,37 @@
+{% extends 'base/admin/admin_base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+{% from 'base/_macros.html' import mostrar_mensaje %}
+{{  mostrar_mensaje(messages) }}
+
+  <form action="/admin/login" method="POST" enctype="multipart/form-data" >
+    <div class="row justify-content-md-center">
+      
+    </div>
+    <div class="row justify-content-md-center">
+      <div class="col-12 col-md-12 text-center">
+        <h3>Administrador</h3>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <label for="usuario">Usuario</label>
+          <input type="text" class="form-control" id="usuario" name="usuario">
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-md-center">
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <label for="contrasena">Contraseña</label>
+          <input type="password" class="form-control" id="contrasena" name="contrasena">
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-md-center">
+      <div class="col-12 col-md-4">
+        <button type="submit" class="btn btn-primary btn-block my-5">Entrar</button>
+      </div>
+    </div>
+  </form>
+
+{% endblock %}

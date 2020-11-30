@@ -1,0 +1,38 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+<h3>Cambiar Contraseña</h3>
+<form action="/monitor/cambiar_contrasena" method="POST" enctype="multipart/form-data">
+
+  <div class="row">
+    <div class="col-3">
+      <div class="form-group">
+        <label for="contrasena_nueva">Contraseña Nueva</label>
+        <input type="password" class="form-control" id="contrasena_nueva" name="contrasena_nueva">
+      </div>
+    </div>
+    <div class="col-3">
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3">
+      <div class="form-group">
+        <label for="repite_contrasena_nueva">Repita Contraseña Nueva</label>
+        <input type="password" class="form-control" id="repite_contrasena_nueva" name="repite_contrasena_nueva">
+      </div>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col mt-5">
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block js_codigo %}
+
+{% endblock %}

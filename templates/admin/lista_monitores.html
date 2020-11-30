@@ -1,0 +1,81 @@
+{% extends 'base/admin/admin_base.html'%}
+
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+<h3>Lista Monitores</h3>
+{% from 'base/_macros.html' import mostrar_mensaje %}
+{{  mostrar_mensaje(messages) }}
+<a href="/admin/monitor/agregar" class="btn btn-success my-3">Agregar</a>
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Usuario</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for monitor in lista_monitores %}
+      <tr>
+        <th scope="row">{{ monitor["idMonitor"] }}</th>
+        <td>{{ monitor["nombre"] }}</td>
+        <td>{{ monitor["usuario"] }}</td>
+        <td>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <a class="btn btn-primary" href="/admin/monitor/modificar/{{ monitor['idMonitor'] }}">Modificar</a>
+            <!-- <button type="button" name="eliminar" class="btn btn-danger" data-toggle="modal" data-target="#staticBackdrop">Eliminar</button> -->
+            <a class="btn btn-warning" href="/admin/monitor/resetear_contrasena/{{ monitor['idMonitor'] }}" onclick="return confirmarReseteoContrasena();">Reset. Contraseña</a>
+            <button type="button" name="eliminar" id="eliminar" class="btn btn-danger" onclick="confirmarEliminado({{ monitor["idMonitor"]  }});">Eliminar</button>
+
+          </div>
+          
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="/admin/monitor/eliminar" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="id-monitor" id="id-monitor" >
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Confirmar Eliminación</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ¿Estas seguro de eliminar a este monitor?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block js_codigo %}
+<script>
+
+  function confirmarEliminado(id) {
+    document.getElementById("id-monitor").value = id;
+    $('#staticBackdrop').modal('show');
+  }
+
+  function confirmarReseteoContrasena() {
+    return confirm("¿Esta seguro de resetear la contraseña para este monitor?");
+  }
+
+</script>
+{% endblock %}

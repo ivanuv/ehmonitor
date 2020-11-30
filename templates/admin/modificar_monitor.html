@@ -1,0 +1,32 @@
+{% extends 'base/admin/admin_base.html'%}
+
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+MODIFICAR MONITOR
+<form action="/admin/monitor/modificar/{{monitor.idMonitor}}" method="POST" enctype="multipart/form-data">
+
+  <div class="row">
+    <div class="col-3">
+      <div class="form-group">
+        <label for="nombre_monitor">Nombre Monitor</label>
+        <input type="text" class="form-control" name="nombre_monitor" id="nombre_monitor" placeholder="Nombre Monitor" value="{{monitor.nombre}}">
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="form-group">
+        <label for="usuario_monitor">Usuario</label>
+        <input type="text" class="form-control" name="usuario_monitor" id="usuario_monitor" placeholder="Usuario Monitor" value="{{monitor.usuario}}">
+      </div>
+    </div>
+  </div>
+
+  <hr>
+  <div class="row">
+    <div class="col mt-5">
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Modificar Monitor</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}

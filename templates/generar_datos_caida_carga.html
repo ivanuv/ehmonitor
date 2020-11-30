@@ -1,0 +1,66 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+<h3>Generar Datos de Caida (carga)</h3>
+<form action="/sensor_caida/generar_carga" method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="id-paciente" id="id-paciente" value="{{idPaciente}}">
+  <input type="hidden" name="id_sensor" id="id_sensor" value="{{id_sensor_caida}}">
+
+
+
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label for="nombre">Fecha </label>
+        <input type="date" class="form-control" name="fecha" id="fecha">
+      </div>
+    </div>
+    <div class="col-3">
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="form-group">
+        <label for="nombre">Hora inicio</label>
+        <input type="number" class="form-control"  name="hora_inicio" id="hora_inicio" min="00" max="23" placeholder="Desde 00 a 24 horas">
+      </div>
+    </div>
+    <div class="col-3">
+
+    </div>
+
+  </div>
+
+
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="custom-file">
+        <input type="file" class="custom-file-input" name="archivo" id="archivo" >
+        <label class="custom-file-label" for="customFileLang" data-browse="Elegir">Seleccionar Archivo</label>
+      </div>
+
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col mt-5">
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Generar Carga de Datos</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block js_codigo %}
+<script>
+
+
+  $('#archivo').on('change', function () {
+    var fileName = document.getElementById("archivo").files[0].name;
+    $(this).next('.custom-file-label').addClass("selected").html(fileName);
+  })
+
+</script>
+{% endblock %}

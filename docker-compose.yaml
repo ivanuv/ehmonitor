@@ -1,0 +1,63 @@
+version: "3"
+services:
+
+  db:
+    image: mysql
+    container_name: "db"
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
+    environment: 
+      MYSQL_ROOT_PASSWORD: ehmonitortest
+      
+      
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment: 
+      - PMA_ARBITRARY=1
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+    - "6379:6379"
+    volumes:
+    - redis-data:/var/lib/redis
+    command: redis-server --appendonly yes
+
+  web:
+    build: .
+    container_name: "app"
+    restart: always
+    links:
+      - db
+    depends_on:
+      - db
+    ports:
+      - "8001:5001"
+    command: gunicorn -w 4 -b 0.0.0.0:5001 -t 900 app:app
+    volumes:
+      - momentaneo:/app/momentaneo
+
+  worker:
+    build: .
+    command: celery -A app.celery worker -c 4 --without-gossip --without-mingle -Ofair
+    depends_on: 
+      - "web"
+      - "redis"
+    restart: always
+    volumes:
+      - momentaneo:/app/momentaneo
+volumes:
+  momentaneo:
+  redis-data:
+networks:
+  web:
+    external:
+      name: nginx-proxy

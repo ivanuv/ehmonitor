@@ -1,0 +1,51 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+<h2>AGREGAR PACIENTE</h2>
+<hr>
+<form action="/pacientes/agregar" method="POST" enctype="multipart/form-data">
+
+  <div class="row">
+    <div class="col-12 col-md-3">
+      <div class="form-group">
+        <label for="nombre_paciente">Nombre Paciente</label>
+        <input type="text" class="form-control" name="nombre_paciente" id="nombre_paciente" placeholder="Nombre Paciente">
+      </div>
+    </div>
+    <div class="col-12 col-md-3">
+      <div class="form-group">
+        <label for="rut_paciente">Rut</label>
+        <input type="number" class="form-control" name="rut_paciente" id="rut_paciente" placeholder="Rut Paciente" min="9999999" max="999999999">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="custom-file">
+        <input type="file" class="custom-file-input" name="mapa_imagen" id="mapa_imagen" >
+        <label class="custom-file-label" for="customFileLang" data-browse="Elegir">Seleccionar Mapa Imagen</label>
+      </div>
+
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col mt-5">
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Agregar Paciente</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block js_codigo %}
+<script>
+
+
+  $('#mapa_imagen').on('change', function () {
+    var fileName = document.getElementById("mapa_imagen").files[0].name;
+    $(this).next('.custom-file-label').addClass("selected").html(fileName);
+  })
+
+</script>
+{% endblock %}

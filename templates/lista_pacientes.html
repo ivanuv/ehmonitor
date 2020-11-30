@@ -1,0 +1,79 @@
+{% extends 'base/base.html' %}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+<h3>Lista Pacientes</h3>
+{% from 'base/_macros.html' import mostrar_mensaje %}
+{{  mostrar_mensaje(messages) }}
+<a href="/pacientes/agregar" class="btn btn-success my-3">Agregar</a>
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Rut</th>
+        <th scope="col">Dashboard</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for paciente in lista_pacientes %}
+      <tr>
+        <th scope="row">{{ paciente[0] }}</th>
+        <td>{{ paciente[1] }}</td>
+        <td>{{ paciente[2] }}</td>
+        <td>
+          <a class="btn btn-info rounded-pill" href="/pacientes/dashboard/{{ paciente[0] }}"><i class="fas fa-eye"></i> Ver Patrones</a>
+        </td>
+        <td>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <a class="btn btn-primary" href="/pacientes/modificar/{{ paciente[0] }}">Modificar</a>
+            <!-- <button type="button" name="eliminar" class="btn btn-danger" data-toggle="modal" data-target="#staticBackdrop">Eliminar</button> -->
+            <button type="button" name="eliminar" id="eliminar" class="btn btn-danger" onclick="confirmarEliminado({{ paciente[0] }});">Eliminar</button>
+            <a class="btn btn-warning" href="/pacientes/{{ paciente[0] }}/sensores">Sensores</a>
+          </div>
+          
+        </td>
+        
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="/pacientes/eliminar" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="id-paciente" id="id-paciente" >
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Confirmar Eliminación</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ¿Estas seguro de eliminar a este paciente?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js_codigo %}
+<script>
+
+  function confirmarEliminado(id) {
+    document.getElementById("id-paciente").value = id;
+    $('#staticBackdrop').modal('show');
+  }
+
+</script>
+{% endblock %}

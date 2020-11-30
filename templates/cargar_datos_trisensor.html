@@ -1,0 +1,38 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+<h3>Cargar Datos Trisensor</h3>
+<form action="/trisensor/cargar_datos" method="POST" enctype="multipart/form-data">
+  <input type="hidden" name="id-paciente" id="id-paciente" value="{{id_paciente}}">
+  <input type="hidden" name="id_sensor" id="id_sensor" value="{{id_sensor_trisensor}}">
+
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <div class="custom-file">
+        <input type="file" class="custom-file-input" name="archivo" id="archivo" >
+        <label class="custom-file-label" for="customFileLang" data-browse="Elegir">Seleccionar Archivo</label>
+      </div>
+
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col mt-5">
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary">Cargar Datos Trisensor</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block js_codigo %}
+<script>
+
+
+  $('#archivo').on('change', function () {
+    var fileName = document.getElementById("archivo").files[0].name;
+    $(this).next('.custom-file-label').addClass("selected").html(fileName);
+  })
+
+</script>
+{% endblock %}

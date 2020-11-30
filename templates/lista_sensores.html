@@ -1,0 +1,171 @@
+{% extends 'base/base.html'%}
+{% block title%} {{title}} {% endblock %}
+{% block contenido %}
+<h3>Lista Sensores</h3>
+<h5>Esta página se actualizará automáticamente cada 30 segundos.</h5>
+<hr>
+{% from 'base/_macros.html' import mostrar_mensaje %}
+{{  mostrar_mensaje(messages) }}
+
+<h4>Sensores Trisensor</h4>
+
+<a href="/pacientes/{{id_paciente}}/sensores/agregar_trisensor" class="btn btn-success my-3">Agregar</a>
+
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Ubicación</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for trisensor in sensores_trisensor %}
+      <tr>
+        <th scope="row">{{ trisensor[0] }}</th>
+        <td>{{ trisensor[1] }}</td>
+        <td class="text-capitalize">{{ trisensor[2] }}</td>
+        <td>
+          {% if trisensor[3]==1 %}
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <a class="btn btn-primary align-middle" href="/trisensor/modificar/{{ trisensor[0] }}">Modificar</a>
+            <!-- <button type="button" name="eliminar" class="btn btn-danger" data-toggle="modal" data-target="#staticBackdrop">Eliminar</button> -->
+            <button type="button" name="eliminar" id="eliminar" class="btn btn-danger" onclick="confirmarEliminadoTrisensor({{ trisensor[0] }});">Eliminar</button>
+            {% if trisensor[2]!="desactivado" %}
+            <a class="btn btn-warning " href="/trisensor/cargar_datos/{{ trisensor[0] }}/{{id_paciente}}">Cargar Datos</a>
+            {% else %}
+            <a class="btn btn-warning disabled" href="#">Sensor desactivado</a>
+            {% endif %}
+          </div>
+          {% else %}
+          <button class="btn btn-primary" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Carga en ejecución...
+          </button>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<hr>
+<h4>Sensores de Caída</h4>
+
+<a href="/pacientes/{{id_paciente}}/sensores/agregar_caidasensor" class="btn btn-success my-3">Agregar</a>
+
+<div class="table-responsive">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Ubicación</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for caidasensor in sensores_caida %}
+      <tr>
+        <th scope="row">{{ caidasensor[0] }}</th>
+        <td>{{ caidasensor[1] }}</td>
+        <td class="text-capitalize">{{ caidasensor[2] }}</td>
+        <td>
+          {% if caidasensor[3]==1 %}
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <a class="btn btn-primary align-middle" href="/sensor_caida/modificar/{{ caidasensor[0] }}"><span class="align-middle">Modificar</span></a>
+            <!-- <button type="button" name="eliminar" class="btn btn-danger" data-toggle="modal" data-target="#staticBackdrop">Eliminar</button> -->
+            <button type="button" name="eliminar" id="eliminar" class="btn btn-danger" onclick="confirmarEliminadoCaidasensor({{ caidasensor[0] }});">Eliminar</button>
+            {% if caidasensor[2]!="desactivado" %}
+            <a class="btn btn-warning  " href="/sensor_caida/generar_carga/{{ caidasensor[0] }}/{{id_paciente}}">Generar Carga</a>
+            {% else %}
+            <a class="btn btn-warning disabled" href="#">Sensor desactivado</a>
+            {% endif %}
+          </div>
+          {% else %}
+          <button class="btn btn-primary" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Carga en ejecución...
+          </button>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+<div class="modal fade" id="modalEliminarSensorTrisensor" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalEliminarSensorTrisensorLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="/trisensor/eliminar" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="id-sensor-trisensor" id="id-sensor-trisensor">
+        <input type="hidden" name="id-paciente" id="id-paciente" value="{{id_paciente}}">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalEliminarSensorTrisensorLabel">Confirmar Eliminación Trisensor</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ¿Estas seguro de eliminar este Trisensor?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalEliminarSensorCaida" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="modalEliminarSensorCaidaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="/sensor_caida/eliminar" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="id-sensor-caida" id="id-sensor-caida">
+        <input type="hidden" name="id-paciente" id="id-paciente-caida" value="{{id_paciente}}">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalEliminarSensorCaidaLabel">Confirmar Eliminación Caída</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          ¿Estas seguro de eliminar este sensor de Caída?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js_codigo %}
+<script>
+
+  function confirmarEliminadoTrisensor(id) {
+    document.getElementById("id-sensor-trisensor").value = id;
+    $('#modalEliminarSensorTrisensor').modal('show');
+  }
+
+  function confirmarEliminadoCaidasensor(id) {
+    document.getElementById("id-sensor-caida").value = id;
+    $('#modalEliminarSensorCaida').modal('show');
+  }
+
+
+  function actualizar() { location.reload(true); }
+  setInterval("actualizar()", 30000);
+
+</script>
+{% endblock %}
